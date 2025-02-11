@@ -1,0 +1,26 @@
+.wrapper {
+    background-size: cover;
+    background-position: 100% 70%;
+    background-image: url('assets/images/declan-sun-unsplash.jpg');
+}
+
+.right_content_wrapper {
+    background-size: cover;
+    background-position: 100%;
+    background-image: url('assets/images/lance-anderson.jpg');
+}
+
+.form {
+    padding-top: 80px;
+
+    @media (max-width: $mantine-breakpoint-sm) {
+        max-width: 100%;
+    }
+}
+
+.title {
+    color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+    font-family:
+        Greycliff CF,
+        var(--mantine-font-family);
+}
