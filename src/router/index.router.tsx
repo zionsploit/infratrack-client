@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router"
 import { Layout } from "../components/Layout"
 import { Home } from "../pages/Core/Home"
 import { CityFunded } from "../pages/Core/Project/CityFunded.Project"
-import { BrgyFunded } from "../pages/Core/Project/BrgyFunded.project"
 import { Constructor } from "../pages/Core/Constructor"
 import { Document } from "../pages/Core/Document"
 import { ProjectInterface } from "../pages/Core/ProjectInterface"
@@ -11,6 +10,8 @@ import { PageOnWork } from "../pages/Core/PageOnWork"
 import { Login } from "../pages/Core/Auth/Login"
 import { Register } from "../pages/Core/Auth/Register"
 import { GuessLayout } from "../components/Layout/GuessLayout"
+import BrgyFunded from "../pages/Core/Project/BrgyFunded"
+import { AddProject } from "../pages/Core/Project/AddProject"
 
 export const Router = () => {
 
@@ -25,8 +26,14 @@ export const Router = () => {
                 <Route path="/dashboard" element={<PageOnWork />} />
                 <Route path="/timeline" element={<PageOnWork />} />
                 <Route path="project">
-                    <Route path="city-funded" element={<CityFunded />} />
-                    <Route path="brgy-funded" element={<BrgyFunded />} />
+                    <Route path="city-funded">
+                        <Route index element={<CityFunded />} />
+                        <Route path="add" element={<AddProject />} />
+                    </Route>
+                    <Route path="brgy-funded">
+                        <Route index element={<BrgyFunded />} />
+                        <Route path="add" element={<AddProject />} />
+                    </Route>
                 </Route>
                 <Route path="/contractor" element={<Constructor />} />
                 <Route path="components">
