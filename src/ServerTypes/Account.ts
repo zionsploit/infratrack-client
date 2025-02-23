@@ -2,6 +2,10 @@
 
 export type AccountLogin = { username: string, password: string, };
 
-export type AccountRegistration = { firstname: string, middlename: string, lastname: string, username: string, password: string, confirmpassword: string, };
+export type RequestAccountCredentials = { username: string, recover_email: string, password: string, confirm_password: string, };
+
+export type RequestAccountInformation = { first_name: string, middle_name: string, last_name: string, email_address: string, contact_number: string, position: string, account_cred_id: string, account_assets_id: number, };
+
+export type ResponseAccountCredentials = { id: string, username: string, recovery_email: string, password: string, created_at: string, updated_at: string, };
 
 export type TokenVerification = { token: string, };
