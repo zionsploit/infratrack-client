@@ -1,13 +1,24 @@
 import { Autocomplete, Badge, Button, Drawer, Flex, Group, NumberFormatter, Paper, Progress, px, rem, Stack, Table, Text, TextInput, ThemeIcon, Tooltip } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { IconInfoSquareRounded, IconPlus, IconSearch, IconSettings } from "@tabler/icons-react"
-import { NavLink } from "react-router"
-import { filterBarangays, filterProjectCategories, filterProjectType, filterSector, filterSourceOfFunds, filterSustainableDevGoal, filterYearsData } from "../mock/CityFundedProject"
-import { TextSubTitle, TextTitle } from "../../../components/ui/Text"
+import { Link, NavLink } from "react-router"
+import { filterBarangays, filterProjectCategories, filterProjectType, filterSector, filterSourceOfFunds, filterSustainableDevGoal, filterYearsData } from "../../mock/CityFundedProject"
+import { TextSubTitle, TextTitle } from "../../../../components/ui/Text"
+import { useEffect, useState } from "react"
+import { ProjectsFunded } from "../../../../ServerTypes/Project"
+import useGetAllProjectByFunded from "../../../../fetchHooks/query/project/useGetAllProjectByFunded"
 
-export const CityFunded = () => {
+export default () => {
     const [openFilterDrawer, handlerOpenFilterDrawer] = useDisclosure(false)
+    const [projectsData, setProjectsData] = useState<Array<ProjectsFunded>>([])
 
+    const getAllProjects = useGetAllProjectByFunded({project_funded: "city-funded", enabled: true})
+
+    useEffect(() => {
+        if (getAllProjects.data) {
+            setProjectsData(getAllProjects.data)
+        }
+    }, [getAllProjects.data])
     return <>
         <Stack gap="xl">
             <Stack mt="xl">
@@ -16,7 +27,7 @@ export const CityFunded = () => {
             </Stack>
             <Paper>
                 <Flex my="sm" justify="space-between">
-                    <Button leftSection={
+                    <Button component={Link} to={"add"} leftSection={
                         <ThemeIcon
                             variant="transparent" size="sm" color="white"
                         >
@@ -49,7 +60,8 @@ export const CityFunded = () => {
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                        <Table.Tr>
+                        {projectsData.length > 0 && projectsData.map((project, index) => 
+                        <Table.Tr key={index}>
                             <Table.Td>
                                 <Flex align="center">
                                     <ThemeIcon
@@ -59,122 +71,32 @@ export const CityFunded = () => {
                                         <IconInfoSquareRounded />
                                     </ThemeIcon>
                                     <Text size="sm" fw={700} c="blue" component={NavLink} to={""}> 
-                                        Quantum Leap Computing Unit
+                                        {project.projects.project_name}
                                     </Text>
                                 </Flex>
                             </Table.Td>
                             <Table.Td>
                                 <Text size="sm" fw={700}>
-                                    DF22-8000-B1g
+                                    {project.projects.project_code}
                                 </Text>
                             </Table.Td>
                             <Table.Td>
                                 <Text size="sm" fw={700}>
-                                    <NumberFormatter thousandSeparator value={290327.22} />
+                                    <NumberFormatter thousandSeparator value={project.project_full_details.project_details.contract_cost} />
                                 </Text>
                             </Table.Td>
                             <Table.Td>
                                 <Text size="sm" fw={700} c="blue" component={NavLink} to={""}>
-                                    BlueRidge Constructors
+                                    {project.project_full_details.contractors.contractor_name}
                                 </Text>
                             </Table.Td>
                             <Table.Td>
                                 <Badge size="sm" variant="light" color="gray">
-                                    - Not yet started at Engineer's Office
+                                    - {project.project_full_details.project_status.status}
                                 </Badge>
                             </Table.Td>
                         </Table.Tr>
-                        <Table.Tr>
-                            <Table.Td>
-                                <Flex align="center">
-                                    <ThemeIcon
-                                        variant="transparent"
-                                        color="blue"
-                                    >
-                                        <IconInfoSquareRounded />
-                                    </ThemeIcon>
-                                    <Text size="sm" fw={700} c="blue" component={NavLink} to={""}> 
-                                        Quantum Leap Computing Unit
-                                    </Text>
-                                </Flex>
-                            </Table.Td>
-                            <Table.Td>
-                                <Text size="sm" fw={700}>
-                                    DF22-8000-B1g
-                                </Text>
-                            </Table.Td>
-                            <Table.Td>
-                                <Text size="sm" fw={700}>
-                                    <NumberFormatter thousandSeparator value={290327.22} />
-                                </Text>
-                            </Table.Td>
-                            <Table.Td>
-                                <Text size="sm" fw={700} c="blue" component={NavLink} to={""}>
-                                    BlueRidge Constructors
-                                </Text>
-                            </Table.Td>
-                            <Table.Td>
-                                <Flex justify="space-between">
-                                    <Text size="xs" fw="bold" c="green">50%</Text>
-                                    <Text size="xs" fw="bold" c="red">20%</Text>
-                                </Flex>
-                                <Tooltip.Group openDelay={500} closeDelay={500}>
-                                    <Tooltip label="Project Completion" position="bottom" color="#bbd0ff" lts={1} fw={600} fz={px(12)} c="black">
-                                        <Progress.Root>
-                                            <Progress.Section style={{ borderColor: 'gray', margin: 1 }} value={80} color="green" />
-                                            <Progress.Section style={{ borderColor: 'gray', margin: 1 }} value={20} color="red" />
-                                        </Progress.Root>
-                                    </Tooltip>
-                                    <Group gap="md" my="xs">
-                                        <Tooltip label="Project Status" position="bottom" color="#bbd0ff" lts={1} fw={600} fz={px(12)} c="black">
-                                            <Badge size="sm" variant="light" color="pink">
-                                                On-Going
-                                            </Badge>
-                                        </Tooltip>
-                                        <Tooltip label="Project Duration" position="bottom" color="#bbd0ff" lts={1} fw={600} fz={px(12)} c="black">
-                                            <Badge size="sm" variant="light" color="indigo">
-                                                Jan 13 2024 - Mar 18 2026
-                                            </Badge>
-                                        </Tooltip>
-                                    </Group>
-                                </Tooltip.Group>
-                            </Table.Td>
-                        </Table.Tr>
-                        <Table.Tr>
-                            <Table.Td>
-                                <Flex align="center">
-                                    <ThemeIcon
-                                        variant="transparent"
-                                        color="blue"
-                                    >
-                                        <IconInfoSquareRounded />
-                                    </ThemeIcon>
-                                    <Text size="sm" fw={700} c="blue" component={NavLink} to={""}> 
-                                        Quantum Leap Computing Unit
-                                    </Text>
-                                </Flex>
-                            </Table.Td>
-                            <Table.Td>
-                                <Text size="sm" fw={700}>
-                                    DF22-8000-B1g
-                                </Text>
-                            </Table.Td>
-                            <Table.Td>
-                                <Text size="sm" fw={700}>
-                                    <NumberFormatter thousandSeparator value={290327.22} />
-                                </Text>
-                            </Table.Td>
-                            <Table.Td>
-                                <Text size="sm" fw={700} c="blue" component={NavLink} to={""}>
-                                    BlueRidge Constructors
-                                </Text>
-                            </Table.Td>
-                            <Table.Td>
-                                <Badge size="sm" variant="light" color="gray">
-                                    - Not yet started at Engineer's Office
-                                </Badge>
-                            </Table.Td>
-                        </Table.Tr>
+                        )}
                     </Table.Tbody>
                 </Table>
             </Paper>

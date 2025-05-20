@@ -1,25 +1,25 @@
 import { Button, Flex, Paper, rem, Stack, Table, Text, TextInput, ThemeIcon } from "@mantine/core"
 import { IconInfoSquareRounded, IconPlus, IconSearch } from "@tabler/icons-react"
-import { NavLink } from "react-router"
-import { TextSubTitle, TextTitle } from "../../components/ui/Text"
+import { Link, NavLink } from "react-router"
+import { TextSubTitle, TextTitle } from "../../../components/ui/Text"
 
-export const Constructor = () => {
+export const Contractors = () => {
 
     return <>
         <Stack gap="xl">
             <Stack mt="xl">
-                <TextTitle label="Constructor" />
-                <TextSubTitle label="A list of all the constructors registered in the system" />
+                <TextTitle label="Contractors" />
+                <TextSubTitle label="A list of all the constractors registered in the system" />
             </Stack>
             <Paper>
                 <Flex my="sm" justify="space-between">
-                    <Button leftSection={
+                    <Button component={Link} to={"add"} leftSection={
                         <ThemeIcon
                             variant="transparent" size="sm" color="white"
                         >
                             <IconPlus />
                         </ThemeIcon>
-                    } size="sm">Add Constructor</Button>
+                    } size="sm">Add Contractor</Button>
                     <TextInput leftSection={
                             <ThemeIcon variant="transparent" size="sm" color="gray">
                                 <IconSearch stroke={1} />

@@ -4,9 +4,21 @@ import { IconInfoSquareRounded, IconPlus, IconSearch, IconSettings } from "@tabl
 import { Link, NavLink } from "react-router"
 import { filterBarangays, filterProjectCategories, filterProjectType, filterSector, filterSourceOfFunds, filterSustainableDevGoal, filterYearsData } from "../../mock/CityFundedProject"
 import { TextSubTitle, TextTitle } from "../../../../components/ui/Text"
+import useGetAllProjectByFunded from "../../../../fetchHooks/query/project/useGetAllProjectByFunded"
+import { useEffect, useState } from "react"
+import { ProjectsFunded } from "../../../../ServerTypes/Project"
 
 export default () => {
     const [openFilterDrawer, handlerOpenFilterDrawer] = useDisclosure(false)
+    const [projectsData, setProjectsData] = useState<Array<ProjectsFunded>>([])
+
+    const getAllProjects = useGetAllProjectByFunded({project_funded: "brgy-funded", enabled: true})
+
+    useEffect(() => {
+        if (getAllProjects.data) {
+            setProjectsData(getAllProjects.data)
+        }
+    }, [getAllProjects.data])
 
     return <>
         <Stack gap="xl">
@@ -49,7 +61,8 @@ export default () => {
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                        <Table.Tr>
+                        {projectsData.length > 0 && projectsData.map((project, index) => 
+                        <Table.Tr key={index}>
                             <Table.Td>
                                 <Flex align="center">
                                     <ThemeIcon
@@ -59,32 +72,33 @@ export default () => {
                                         <IconInfoSquareRounded />
                                     </ThemeIcon>
                                     <Text size="sm" fw={700} c="blue" component={NavLink} to={""}> 
-                                        Quantum Leap Computing Unit
+                                        {project.projects.project_name}
                                     </Text>
                                 </Flex>
                             </Table.Td>
                             <Table.Td>
                                 <Text size="sm" fw={700}>
-                                    DF22-8000-B1g
+                                    {project.projects.project_code}
                                 </Text>
                             </Table.Td>
                             <Table.Td>
                                 <Text size="sm" fw={700}>
-                                    <NumberFormatter thousandSeparator value={290327.22} />
+                                    <NumberFormatter thousandSeparator value={project.project_full_details.project_details.contract_cost} />
                                 </Text>
                             </Table.Td>
                             <Table.Td>
                                 <Text size="sm" fw={700} c="blue" component={NavLink} to={""}>
-                                    BlueRidge Constructors
+                                    {project.project_full_details.contractors.contractor_name}
                                 </Text>
                             </Table.Td>
                             <Table.Td>
                                 <Badge size="sm" variant="light" color="gray">
-                                    - Not yet started at Engineer's Office
+                                    - {project.project_full_details.project_status.status}
                                 </Badge>
                             </Table.Td>
                         </Table.Tr>
-                        <Table.Tr>
+                        )}
+                        {/* <Table.Tr>
                             <Table.Td>
                                 <Flex align="center">
                                     <ThemeIcon
@@ -174,7 +188,7 @@ export default () => {
                                     - Not yet started at Engineer's Office
                                 </Badge>
                             </Table.Td>
-                        </Table.Tr>
+                        </Table.Tr> */}
                     </Table.Tbody>
                 </Table>
             </Paper>

@@ -3,7 +3,7 @@ import { yearListArray } from "../../../utils/DateUtils"
 import dayjs from 'dayjs'
 import useGetAllProjectStatus from "../../../fetchHooks/query/projectStatus/useGetAllProjectStatus"
 import { useEffect, useState } from "react"
-import { Project, ResponseProjectStatus } from "../../../ServerTypes/Project"
+import { ResponseProjectStatus } from "../../../ServerTypes/Project"
 import useGetAllBarangays from "../../../fetchHooks/query/projectInterface/useGetAllBarangays"
 import { ReturnBarangays, ReturnCategories, ReturnIncharge, ReturnProjectTypes, ReturnSectors, ReturnSourceOfFunds, ReturnSustainableDevelopmentGoals } from "../../../ServerTypes/ProjectInterface"
 import useGetAllPt from "../../../fetchHooks/query/projectInterface/useGetAllPt"
@@ -16,59 +16,12 @@ import { ReturnProjectTakers } from "../../../ServerTypes/ProjectTakers"
 import useGetAllProjectTakers from "../../../fetchHooks/query/projectTakers/useGetAllProjectTakers"
 import { IconPercentage } from "@tabler/icons-react"
 import { Controller, useForm } from "react-hook-form"
-import { getURL } from "../../../utils/UrlUtils"
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup"
-
-
-// DEFINED CONSTANT VALUE
-const projectFunded = getURL().split('/')[2]
-
-const projectSchema = yup.object({
-    project_name: yup.string().required("Project name is required."),
-    project_year: yup.string().required("Project year is required."),
-    project_funded: yup.string().required("Project Code is required."),
-    project_code: yup.string().required("Project Code is required."),
-    project_status_id: yup.string().required("Project Status is required."),
-    project_barangay_id: yup.string().required("Project Barangay is required."),
-    appropriation: yup.number().default(0).required("Project appropriation should have default 0 value"),
-    approved_budget_contract: yup.number().required("Project ABC required."),
-    contract_detail_id: yup.number().required("Project contractd details required."),
-    project_type_id: yup.string().required("Project type required"),
-    project_category_id: yup.string().required("Project category required"),
-    project_source_of_fund_id: yup.string().required("Project source of funds required"),
-    project_mode_of_implementation_id: yup.string().required("Project mode of implementation required"),
-    project_sustainable_developement_id: yup.string().required("Project sustainable development goals required"),
-    project_sector_id: yup.string().required("Project sector is required"),
-    project_taker_id: yup.string().required("Project taker is required"),
-    accomplished: yup.number().default(0).required("Project accomplished is required"),
-    remarks: yup.string().default(""),
-    prepared_by: yup.string().default("")
-})
-
-type ParseProject = Omit<Project, 
-    'project_year' | 
-    'project_status_id' |
-    'project_barangay_id' | 
-    'project_type_id' | 
-    'project_category_id' | 
-    'project_source_of_fund_id' | 
-    'project_mode_of_implementation_id' | 
-    'project_sustainable_developement_id' | 
-    'project_sector_id' | 
-    'project_taker_id'
-    > & { 
-        project_year: string,
-        project_status_id: string,
-        project_barangay_id: string,
-        project_type_id: string,
-        project_category_id: string,
-        project_source_of_fund_id: string,
-        project_mode_of_implementation_id: string,
-        project_sustainable_developement_id: string,
-        project_sector_id: string,
-        project_taker_id: string
-    }
+import useAddProject from "../../../fetchHooks/mutation/project/useAddProject"
+import { ReturnContractors } from "../../../ServerTypes/Contractors"
+import useGetAllContractor from "../../../fetchHooks/query/contractor/useGetAllContractor"
+import { ParseProject, getProjectFundedUrl, projectSchema } from "./_projects.api"
+import { DateInput } from '@mantine/dates';
 
 export const AddProject =  () => {
     const [projectTakersData, setProjectTakersData] = useState<Array<ReturnProjectTakers>>([])
@@ -80,12 +33,13 @@ export const AddProject =  () => {
     const [projectTypeData, setProjectTypesData] = useState<Array<ReturnProjectTypes>>([])
     const [barangaysData, setBarangaysData] = useState<Array<ReturnBarangays>>([])
     const [projectStatusData, setProjectStatusData] = useState<Array<ResponseProjectStatus>>([])
+    const [contractorsData, setContractorsData] = useState<Array<ReturnContractors>>([])
 
-    const { handleSubmit, control, formState: { errors, defaultValues } } = useForm<ParseProject>({
+    const { handleSubmit, control, formState: { errors, defaultValues }, watch } = useForm<ParseProject>({
         defaultValues: {
             project_name: "",
-            project_year: "",
-            project_funded: projectFunded,
+            project_year: dayjs(new Date()).year().toString(),
+            project_funded: getProjectFundedUrl,
             project_code: '',
             project_status_id: "",
             project_barangay_id: "",
@@ -101,14 +55,23 @@ export const AddProject =  () => {
             project_taker_id: "",
             accomplished: 0,
             remarks: "",
+            contractor: "",
+            contract_cost: 0,
+            start_date: new Date(),
+            end_date: new Date(),
+            day_extension: 0,
             // TO DO: Replace to current users
             // wip: remove static value for prepared_by into current users name
             prepared_by: 'John Banisilon'
         },
         resolver: yupResolver(projectSchema)
     })
+    
 
+    // MUTATION
+    const addProject = useAddProject()
 
+    // QUERY
     const getAllProjectStatus = useGetAllProjectStatus()
     const getAllBarangays = useGetAllBarangays()
     const getAllProjectTypes = useGetAllPt()
@@ -118,6 +81,7 @@ export const AddProject =  () => {
     const getAllProjectSdg = useGetAllSdg()
     const getAllProjectSector = useGetAllSector()
     const getAllProjectTakers = useGetAllProjectTakers()
+    const getAllContractors = useGetAllContractor()
 
     useEffect(() => {
         if (getAllProjectStatus.data) {
@@ -173,9 +137,14 @@ export const AddProject =  () => {
         }
     }, [getAllProjectTakers.data])
 
+    useEffect(() => {
+        if (getAllContractors.data) {
+            setContractorsData(getAllContractors.data)
+        }
+    }, [getAllContractors.data])
+
     const OnClickSubmitData = async (data: ParseProject) => {
-        console.log(data)
-        console.log("SOMETHING")
+        await addProject.mutateAsync(data)
     }
 
     return <>
@@ -459,9 +428,85 @@ export const AddProject =  () => {
                 </Paper>
                 <Divider my="xl" />
                 <Paper withBorder p="md" shadow="lg" w={rem("100%")}>
+                    <Stack my="sm">
+                        <Text fz="h3" fw={500} lh={0.1}>Contract Details</Text>
+                        <Text size="sm">It's inclusive dates and amounts relative to the contract.</Text>
+                    </Stack>
+                    <Stack>
+                        <Controller
+                            control={control}
+                            name="contractor"
+                            render={({ field }) => <Select
+                                w={rem("500px")}
+                                label="Contractor:"
+                                placeholder="Select Contractor"
+                                data={contractorsData.map((contractor) => {
+                                    return {
+                                        label: contractor.contractor_name,
+                                        value: contractor.id.toString()
+                                    }
+                                })}
+                                error={errors.contractor?.message}
+                                {...field}
+                                clearable
+                            />}
+                        />
+                        <Controller
+                            control={control}
+                            name="contract_cost"
+                            render={({ field }) => <NumberInput
+                                w={rem("500px")}
+                                hideControls
+                                label="Contractor Cost:"
+                                thousandSeparator
+                                error={errors.contract_cost?.message}
+                                {...field}
+                            />}
+                        />
+                        <Controller
+                            control={control}
+                            name="start_date"
+                            render={({ field }) => <DateInput
+                                {...field}
+                                w={rem("500px")}
+                                label="Start Date"
+                                value={field.value}
+                                onChange={field.onChange}
+                                error={errors.start_date?.message}
+                            />}
+                        />
+                        <Controller
+                            control={control}
+                            name="end_date"
+                            render={({ field }) => <DateInput
+                                {...field}
+                                w={rem("500px")}
+                                label="Target Date"
+                                value={field.value}
+                                onChange={field.onChange}
+                                error={errors.end_date?.message}
+                            />}
+                        />
+                        <Controller
+                            control={control}
+                            name="day_extension"
+                            render={({ field }) => <NumberInput
+                                w={rem("500px")}
+                                hideControls
+                                label="Day Extension:"
+                                description="(Optional)"
+                                error={errors.contract_cost?.message}
+                                {...field}
+                            />}
+                        />
+                        <Text c="dimmed">Calenday Days: {Math.abs(dayjs(watch("start_date")).diff(watch("end_date"), 'day')) + watch("day_extension")}</Text>
+                    </Stack>
+                </Paper>
+                <Divider my="xl" />
+                <Paper withBorder p="md" shadow="lg" w={rem("100%")}>
                     <Flex justify="space-between" align="center">
                         <Text fz="lg" fw="bold">Prepared By: {defaultValues?.prepared_by}</Text>
-                        <Button type="submit" color="green">Initialized Project</Button>
+                        <Button loading={addProject.isPending} type="submit" color="green">Initialized Project</Button>
                     </Flex>
                 </Paper>
             </form>

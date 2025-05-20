@@ -1,8 +1,6 @@
 import { Route, Routes } from "react-router"
 import { Layout } from "../components/Layout"
 import { Home } from "../pages/Core/Home"
-import { CityFunded } from "../pages/Core/Project/CityFunded.Project"
-import { Constructor } from "../pages/Core/Constructor"
 import { Document } from "../pages/Core/Document"
 import { ProjectInterface } from "../pages/Core/ProjectInterface"
 import { UsersManagement } from "../pages/Core/UsersManagement"
@@ -10,8 +8,14 @@ import { PageOnWork } from "../pages/Core/PageOnWork"
 import { Login } from "../pages/Core/Auth/Login"
 import { Register } from "../pages/Core/Auth/Register"
 import { GuessLayout } from "../components/Layout/GuessLayout"
-import BrgyFunded from "../pages/Core/Project/BrgyFunded"
 import { AddProject } from "../pages/Core/Project/AddProject"
+import { Contractors } from "../pages/Core/Contractors"
+import AddContractors from "../pages/Core/Contractors/Contractors.add"
+import { lazy, Suspense } from "react"
+import { Loading } from "../components/ui/Loading"
+
+const CityFunded = lazy(() => import("../pages/Core/Project/CityFunded"))
+const BrgyFunded = lazy(() => import("../pages/Core/Project/BrgyFunded"))
 
 export const Router = () => {
 
@@ -27,15 +31,26 @@ export const Router = () => {
                 <Route path="/timeline" element={<PageOnWork />} />
                 <Route path="project">
                     <Route path="city-funded">
-                        <Route index element={<CityFunded />} />
+                        <Route index element={
+                            <Suspense fallback={<Loading />}>
+                                <CityFunded />
+                            </Suspense>
+                        } />
                         <Route path="add" element={<AddProject />} />
                     </Route>
                     <Route path="brgy-funded">
-                        <Route index element={<BrgyFunded />} />
+                        <Route index element={
+                            <Suspense fallback={<Loading />}>
+                                <BrgyFunded />
+                            </Suspense>
+                        }/>
                         <Route path="add" element={<AddProject />} />
                     </Route>
                 </Route>
-                <Route path="/contractor" element={<Constructor />} />
+                <Route path="contractor">
+                    <Route index element={<Contractors />} />
+                    <Route path="add" element={<AddContractors />} />
+                </Route>
                 <Route path="components">
                     <Route path="project-interface" element={<ProjectInterface />} />
                     <Route path="document" element={<Document />} />
