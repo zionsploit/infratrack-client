@@ -4,11 +4,6 @@ import { Sidebar } from "./Sidebar"
 import { Outlet } from "react-router"
 import { IconBell, IconDiamond, IconHome } from "@tabler/icons-react"
 import useVerifiyToken from "../../fetchHooks/utils/useVerifiyToken"
-import { useEffect } from "react"
-import { ServerDown } from "../ui/ServerDown"
-import { Loading } from "../ui/Loading"
-import { decodeToken } from "react-jwt"
-import { ReturnAccountRegistration, setAccountInformation } from "../../reduxFeature/accountSlice"
 import { useDispatch } from "react-redux"
 
 export const Layout = () => {
@@ -16,22 +11,22 @@ export const Layout = () => {
     const verifyToken = useVerifiyToken()
     const dispatch = useDispatch()
 
-    useEffect(() => {
-        const verify = async () => {
-            await verifyToken.mutateAsync().then((res) => {
-                if (res == "TokenIsValid") {
-                    const getToken = localStorage.getItem("_auth_token") as string
-                    const token = decodeToken(getToken) as Record<"sub", ReturnAccountRegistration>
-                    dispatch(setAccountInformation(token.sub))
-                }
-            })
-        }
-        verify()
-    }, [])
+    // useEffect(() => {
+    //     const verify = async () => {
+    //         await verifyToken.mutateAsync().then((res) => {
+    //             if (res == "TokenIsValid") {
+    //                 const getToken = localStorage.getItem("_auth_token") as string
+    //                 const token = decodeToken(getToken) as Record<"sub", ReturnAccountRegistration>
+    //                 dispatch(setAccountInformation(token.sub))
+    //             }
+    //         })
+    //     }
+    //     verify()
+    // }, [])
 
-    if (verifyToken.isPending) return <Loading />
+    // if (verifyToken.isPending) return <Loading />
 
-    if (verifyToken.isError) return <ServerDown />
+    // if (verifyToken.isError) return <ServerDown />
 
     return <>
         <AppShell
